@@ -6,11 +6,15 @@ This repository contains the R code and data used for the systematic review and 
 Data
 
 The dataset used in this analysis is stored in an Excel file named meta_analysis_data.xlsx with two sheets:
+
 HbA1c: Contains data for HbA1c levels across the intervention and control groups.
+
 FBG: Contains data for fasting blood glucose levels across the intervention and control groups.
 
 R Packages
 
 The following R packages are required to run the analysis:
+
 meta: For performing the meta-analysis.
+
 readxl: For reading data from Excel files.
