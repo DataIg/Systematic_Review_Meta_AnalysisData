@@ -1,9 +1,11 @@
 
 # Install and load necessary packages
 install.packages("meta")
+install.packages("metafor")
 install.packages("readxl")
 library(meta)
 library(readxl)
+library(metafor)
 
 # Load the HbA1c data
 hba1c_data <- read_excel("meta_analysis_data.xlsx", sheet = "HbA1c")
@@ -304,16 +306,6 @@ forest(meta_fbg_intervention,
 )
 
 
-# Egger's test for HbA1c meta-analysis
-egger_hba1c <- metabias(meta_hba1c, method.bias = "linreg")
-print(egger_hba1c)
-summary(egger_hba1c)
-
-# Egger's test for FBG meta-analysis
-egger_fbg <- metabias(meta_fbg, method.bias = "linreg")
-print(egger_fbg)
-summary(egger_fbg)
-
 # Forest plot for HbA1c data with Trim and Fill - Fixing overlap
 forest(trimfill_hba1c, 
        col.square = "blue",           # Color of the weight boxes
@@ -349,3 +341,46 @@ forest(trimfill_fbg,
        cex = 1.2,                     # Adjust text size for labels
        mar = c(6, 8, 4, 2)            # Adjust margins: bottom, left, top, right
 )
+
+
+# Egger's test for HbA1c meta-analysis
+egger_hba1c <- metabias(meta_hba1c, method.bias = "linreg")
+print(egger_hba1c)
+summary(egger_hba1c)
+
+# Egger's test for FBG meta-analysis (with k.min adjustment)
+egger_fbg <- metabias(meta_fbg, method.bias = "linreg", k.min = 9)  # Override k.min to match your study count
+print(egger_fbg)
+summary(egger_fbg)
+
+#in order to run begg's test, we need to use different package
+# Load necessary package
+library(metafor)
+
+# Run meta-analysis for HbA1c data
+meta_hba1c <- rma(measure = "MD", 
+                  m1i = hba1c_data$Mean_Intervention, 
+                  sd1i = hba1c_data$SD_Intervention, 
+                  n1i = hba1c_data$Total_Intervention, 
+                  m2i = hba1c_data$Mean_Control, 
+                  sd2i = hba1c_data$SD_Control, 
+                  n2i = hba1c_data$Total_Control, 
+                  data = hba1c_data)
+
+# Perform Begg's test for HbA1c
+begg_hba1c <- ranktest(meta_hba1c)
+print(begg_hba1c)
+
+# Run meta-analysis for FBG data
+meta_fbg <- rma(measure = "MD", 
+                m1i = fbg_data$Mean_Intervention, 
+                sd1i = fbg_data$SD_Intervention, 
+                n1i = fbg_data$Total_Intervention, 
+                m2i = fbg_data$Mean_Control, 
+                sd2i = fbg_data$SD_Control, 
+                n2i = fbg_data$Total_Control, 
+                data = fbg_data)
+
+# Perform Begg's test for FBG
+begg_fbg <- ranktest(meta_fbg)
+print(begg_fbg)
